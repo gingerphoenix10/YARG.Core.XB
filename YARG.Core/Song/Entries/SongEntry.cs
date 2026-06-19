@@ -98,9 +98,12 @@ namespace YARG.Core.Song
         public SortString Source => _source;
         public SortString Playlist => _playlist;
 
+        public string CoveredBy => _metadata.CoveredBy;
+
         public string UnmodifiedYear => _metadata.Year;
         public string ParsedYear => _parsedYear;
         public int YearAsNumber => _yearAsNumber;
+        public string YearSecondary => _metadata.YearSecondary;
 
         public bool IsMaster => _metadata.IsMaster;
         public bool VideoLoop => _metadata.VideoLoop;
@@ -138,6 +141,7 @@ namespace YARG.Core.Song
         public string CreditPublishedBy          => _metadata.CreditPublishedBy;
         public string CreditWrittenBy            => _metadata.CreditWrittenBy;
 
+        public string CharterAudio       => _metadata.CharterAudio;
         public string CharterBass       => _metadata.CharterBass;
         public string CharterDrums      => _metadata.CharterDrums;
         public string CharterEliteDrums => _metadata.CharterEliteDrums;
@@ -377,7 +381,9 @@ namespace YARG.Core.Song
             stream.Write(_metadata.Video.Start, Endianness.Little);
             stream.Write(_metadata.Video.End, Endianness.Little);
 
+            stream.Write(_metadata.CoveredBy);
             stream.Write(_metadata.LoadingPhrase);
+            stream.Write(_metadata.YearSecondary);
 
             stream.Write(_metadata.LinkBandcamp);
             stream.Write(_metadata.LinkBluesky);
@@ -407,6 +413,7 @@ namespace YARG.Core.Song
             stream.Write(_metadata.CreditPublishedBy);
             stream.Write(_metadata.CreditWrittenBy);
 
+            stream.Write(_metadata.CharterAudio);
             stream.Write(_metadata.CharterBass);
             stream.Write(_metadata.CharterDrums);
             stream.Write(_metadata.CharterEliteDrums);
@@ -444,7 +451,7 @@ namespace YARG.Core.Song
             _metadata.Year =     strings.Years    [stream.Read<int>(Endianness.Little)];
             _metadata.Charter =  strings.Charters [stream.Read<int>(Endianness.Little)];
             _metadata.Playlist = strings.Playlists[stream.Read<int>(Endianness.Little)];
-            _metadata.Source =   strings.Sources  [stream.Read<int>(Endianness.Little)];            
+            _metadata.Source =   strings.Sources  [stream.Read<int>(Endianness.Little)];
 
             _metadata.IsMaster =  stream.ReadBoolean();
             _metadata.VideoLoop = stream.ReadBoolean();
@@ -462,7 +469,9 @@ namespace YARG.Core.Song
             _metadata.Video.Start = stream.Read<long>(Endianness.Little);
             _metadata.Video.End = stream.Read<long>(Endianness.Little);
 
+            _metadata.CoveredBy = stream.ReadString();
             _metadata.LoadingPhrase = stream.ReadString();
+            _metadata.YearSecondary = stream.ReadString();
 
             _metadata.LinkBandcamp = stream.ReadString();
             _metadata.LinkBluesky = stream.ReadString();
@@ -492,6 +501,7 @@ namespace YARG.Core.Song
             _metadata.CreditPublishedBy = stream.ReadString();
             _metadata.CreditWrittenBy = stream.ReadString();
 
+            _metadata.CharterAudio = stream.ReadString();
             _metadata.CharterBass = stream.ReadString();
             _metadata.CharterDrums = stream.ReadString();
             _metadata.CharterEliteDrums = stream.ReadString();

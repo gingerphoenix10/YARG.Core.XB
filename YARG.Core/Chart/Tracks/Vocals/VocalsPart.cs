@@ -130,7 +130,45 @@ namespace YARG.Core.Chart
 
         public VocalsPart Clone()
         {
-            return new(this);
+            return new VocalsPart(this);
+        }
+
+        public void TrimToTickRange(uint tickStart, uint tickEnd)
+        {
+            NotePhrases.RemoveAll(phrase => !IsVocalPhraseInTickRange(phrase, tickStart, tickEnd));
+            StaticLyricPhrases.RemoveAll(phrase => !IsVocalPhraseInTickRange(phrase, tickStart, tickEnd));
+            OtherPhrases.RemoveAll(phrase => !IsTickInRange(phrase.Tick, tickStart, tickEnd));
+            TextEvents.RemoveAll(text => !IsTickInRange(text.Tick, tickStart, tickEnd));
+        }
+
+        private static bool IsVocalPhraseInTickRange(VocalsPhrase phrase, uint tickStart, uint tickEnd)
+        {
+            if (IsTickInRange(phrase.Tick, tickStart, tickEnd))
+            {
+                return true;
+            }
+
+            if (phrase.PhraseParentNote.ChildNotes.Count == 0 && phrase.Lyrics.Count == 0)
+            {
+                return false;
+            }
+
+            if (phrase.PhraseParentNote.ChildNotes.Any(note => !IsNoteInRange(note, tickStart, tickEnd)))
+            {
+                return false;
+            }
+
+            return phrase.Lyrics.All(lyric => IsTickInRange(lyric.Tick, tickStart, tickEnd));
+        }
+
+        private static bool IsNoteInRange(VocalNote note, uint tickStart, uint tickEnd)
+        {
+            return note.Tick >= tickStart && note.TotalTickEnd <= tickEnd;
+        }
+
+        private static bool IsTickInRange(uint tick, uint tickStart, uint tickEnd)
+        {
+            return tick >= tickStart && tick < tickEnd;
         }
     }
 }

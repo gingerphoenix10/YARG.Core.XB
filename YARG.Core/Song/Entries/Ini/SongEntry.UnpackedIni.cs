@@ -33,7 +33,8 @@ namespace YARG.Core.Song
         public override StemMixer? LoadAudio(float speed, double volume, params SongStem[] ignoreStems)
         {
             bool clampStemVolume = _metadata.Source.ToLowerInvariant() == "yarg";
-            var mixer = GlobalAudioHandler.CreateMixer(ToString(), speed, volume, clampStemVolume, true);
+            var mixer = GlobalAudioHandler.CreateMixer(ToString(), speed, volume, clampStemVolume: clampStemVolume,
+                normalize: true);
             if (mixer == null)
             {
                 YargLogger.LogError("Failed to create mixer!");
@@ -119,10 +120,10 @@ namespace YARG.Core.Song
             return null;
         }
 
-        public override BackgroundResult? LoadBackground()
+        public override BackgroundResult? LoadBackground(bool excludeYarground = false)
         {
             var subFiles = GetSubFiles();
-            if (subFiles.TryGetValue("bg.yarground", out var file))
+            if (subFiles.TryGetValue("bg.yarground", out var file) && !excludeYarground)
             {
                 var stream = File.OpenRead(file);
                 return new BackgroundResult(BackgroundType.Yarground, stream);
@@ -157,6 +158,7 @@ namespace YARG.Core.Song
             return null;
         }
 
+        #nullable disable
         public override FixedArray<byte> LoadMiloData()
         {
             return null;
@@ -164,21 +166,28 @@ namespace YARG.Core.Song
 
         protected override FixedArray<byte> GetChartData(string filename)
         {
-            var data = default(FixedArray<byte>);
-
             string chartPath = Path.Combine(_location, filename);
-            if (AbridgedFileInfo.Validate(chartPath, in _chartLastWrite))
+            if (!AbridgedFileInfo.Validate(chartPath, in _chartLastWrite))
             {
-                string iniPath = Path.Combine(_location, "song.ini");
-                if (_iniLastWrite.HasValue
-                    ? AbridgedFileInfo.Validate(iniPath, _iniLastWrite.Value)
-                    : !File.Exists(iniPath))
+                return null;
+            }
+
+            string iniPath = Path.Combine(_location, "song.ini");
+            if (_iniLastWrite.HasValue)
+            {
+                if (!AbridgedFileInfo.Validate(iniPath, _iniLastWrite.Value) && File.Exists(iniPath))
                 {
-                    data = FixedArray.LoadFile(chartPath);
+                    return null;
                 }
             }
-            return data;
+            else if (File.Exists(iniPath))
+            {
+                return null;
+            }
+
+            return FixedArray.LoadFile(chartPath);
         }
+        #nullable restore
 
         private Dictionary<string, string> GetSubFiles()
         {

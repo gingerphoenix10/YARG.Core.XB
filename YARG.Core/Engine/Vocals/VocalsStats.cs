@@ -65,9 +65,9 @@ namespace YARG.Core.Engine.Vocals
             writer.Write(HasCarryNote);
         }
 
-        public override ReplayStats ConstructReplayStats(string name)
+        public override ReplayStats ConstructReplayStats(string name, bool isReplayPlayer)
         {
-            return new VocalsReplayStats(name, this);
+            return new VocalsReplayStats(name, isReplayPlayer, this);
         }
     }
 }

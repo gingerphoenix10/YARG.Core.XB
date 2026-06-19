@@ -98,7 +98,7 @@ namespace YARG.Core.Song
             return null;
         }
 
-        public override BackgroundResult? LoadBackground()
+        public override BackgroundResult? LoadBackground(bool excludeYarground = false)
         {
             using var sngFile = SngFile.TryLoadFromFile(_location, false);
             if (!sngFile.IsLoaded)
@@ -112,7 +112,7 @@ namespace YARG.Core.Song
             }
 
             string file = Path.ChangeExtension(_location, YARGROUND_EXTENSION);
-            if (File.Exists(file))
+            if (File.Exists(file) && !excludeYarground)
             {
                 return new BackgroundResult(BackgroundType.Yarground, File.OpenRead(file));
             }
@@ -194,7 +194,8 @@ namespace YARG.Core.Song
         private StemMixer? CreateAudioMixer(float speed, double volume, in SngFile sngFile, params SongStem[] ignoreStems)
         {
             bool clampStemVolume = _metadata.Source.ToLowerInvariant() == "yarg";
-            var mixer = GlobalAudioHandler.CreateMixer(ToString(), speed, volume, true, clampStemVolume);
+            var mixer = GlobalAudioHandler.CreateMixer(ToString(), speed, volume, clampStemVolume: clampStemVolume,
+                normalize: true);
             if (mixer == null)
             {
                 YargLogger.LogError("Failed to create mixer");

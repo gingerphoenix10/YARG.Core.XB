@@ -378,7 +378,7 @@ namespace YARG.Core.Audio
                 {
                     throw new NotInitializedException();
                 }
-                return _instance.CreateMixer(name, speed, mixerVolume, clampStemVolume, normalize);
+                return _instance.CreateMixer(name, speed, mixerVolume, clampStemVolume: clampStemVolume, normalize: normalize);
             }
         }
 
@@ -430,17 +430,6 @@ namespace YARG.Core.Audio
             }
         }
 
-        public static void TogglePlaybackBuffer(bool enable)
-        {
-            lock (_instanceLock)
-            {
-                if (_instance == null)
-                {
-                    throw new NotInitializedException();
-                }
-                _instance.ToggleBuffer(enable);
-            }
-        }
 
         public static void SetBufferLength(int length)
         {
@@ -538,6 +527,21 @@ namespace YARG.Core.Audio
                     default:
                         _instance?.SetOutputChannel(channel);
                         break;
+                }
+            }
+        }
+
+        public static void StopAllSfxChannels()
+        {
+            lock (_instanceLock)
+            {
+                if (_instance == null)
+                {
+                    throw new NotInitializedException();
+                }
+                foreach (SampleChannel sample in _instance.SfxSamples)
+                {
+                    sample?.Stop();
                 }
             }
         }
