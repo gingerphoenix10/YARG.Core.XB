@@ -1,16 +1,19 @@
 ﻿using System;
+using YARG.Core.IO;
 using YARG.Core.IO.Ini;
 
 namespace YARG.Core.Song
 {
     public enum SongRating : uint
     {
-        Unspecified,
         Family_Friendly,
         Supervision_Recommended,
         Mature,
-        No_Rating
-    };
+        Sensitive_Content,
+        Unspecified,
+        No_Rating,
+        None                 // Make sure 'none' is always last in the list
+    }
 
     public struct SongMetadata
     {
@@ -26,12 +29,14 @@ namespace YARG.Core.Song
         {
             Name = DEFAULT_NAME,
             Artist = DEFAULT_ARTIST,
+            CoveredBy = string.Empty,
             Album = DEFAULT_ALBUM,
             Genre = string.Empty,
             Subgenre = string.Empty,
             Charter = DEFAULT_CHARTER,
             Source = DEFAULT_SOURCE,
             Year = DEFAULT_YEAR,
+            YearSecondary = string.Empty,
             Playlist = string.Empty,
             IsMaster = true,
             VideoLoop = false,
@@ -63,6 +68,7 @@ namespace YARG.Core.Song
             CreditProducedBy = string.Empty,
             CreditPublishedBy = string.Empty,
             CreditWrittenBy = string.Empty,
+            CharterAudio = string.Empty,
             CharterBass = string.Empty,
             CharterDrums = string.Empty,
             CharterEliteDrums = string.Empty,
@@ -76,6 +82,7 @@ namespace YARG.Core.Song
             CharterVocals = string.Empty,
             SongLength = 0,
             SongOffset = 0,
+            SongRating = SongRating.Unspecified,
             Preview = (-1, -1),
             Video = (0, -1),
             VocalScrollSpeedScalingFactor = null,
@@ -84,6 +91,7 @@ namespace YARG.Core.Song
 
         public string Name;
         public string Artist;
+        public string CoveredBy;
         public string Album;
         public string Genre;
         public string Subgenre;
@@ -91,6 +99,7 @@ namespace YARG.Core.Song
         public string Source;
         public string Playlist;
         public string Year;
+        public string YearSecondary;
 
         public long SongLength;
         public long SongOffset;
@@ -135,6 +144,7 @@ namespace YARG.Core.Song
         public string CreditPublishedBy;
         public string CreditWrittenBy;
 
+        public string CharterAudio;
         public string CharterBass;
         public string CharterDrums;
         public string CharterEliteDrums;
@@ -167,6 +177,11 @@ namespace YARG.Core.Song
             if (modifiers.Extract("artist", out string artist) && artist.Length > 0)
             {
                 metadata.Artist = artist;
+            }
+
+            if (modifiers.Extract("covered_by", out string coveredBy))
+            {
+                metadata.CoveredBy = coveredBy;
             }
 
             if (modifiers.Extract("album", out string album) && album.Length > 0)
@@ -347,6 +362,11 @@ namespace YARG.Core.Song
                 metadata.CreditWrittenBy = creditWrittenBy;
             }
 
+            if (modifiers.Extract("charter_audio", out string charterAudio))
+            {
+                metadata.CharterAudio = charterAudio;
+            }
+
             if (modifiers.Extract("charter_bass", out string charterBass))
             {
                 metadata.CharterBass = charterBass;
@@ -422,7 +442,7 @@ namespace YARG.Core.Song
 
             if (modifiers.Extract("rating", out uint songRating))
             {
-                metadata.SongRating = (SongRating)songRating;
+                metadata.SongRating = RatingHelper.ParseSongRating(songRating);
             }
 
             if (modifiers.Extract("song_length", out long songLength))

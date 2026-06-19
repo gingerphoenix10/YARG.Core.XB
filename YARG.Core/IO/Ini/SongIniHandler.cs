@@ -33,6 +33,7 @@ namespace YARG.Core.IO.Ini
 
                 //{ "cassettecolor",                        new("cassettecolor", ModifierType.UInt32) },
                 { "charter",                              new("charter", ModifierType.String) },
+                { "charter_audio",                        new("charter_audio", ModifierType.String) },
                 { "charter_bass",                         new("charter_bass", ModifierType.String) },
                 { "charter_drums",                        new("charter_drums", ModifierType.String) },
                 { "charter_elite_drums",                  new("charter_elite_drums", ModifierType.String) },
@@ -46,6 +47,7 @@ namespace YARG.Core.IO.Ini
                 { "charter_vocals",                       new("charter_vocals", ModifierType.String) },
                 { "count",                                new("count", ModifierType.UInt32) },
                 { "cover",                                new("cover", ModifierType.String) },
+                { "covered_by",                           new("covered_by", ModifierType.String) },
                 { "credit_album_art_by",                  new("credit_album_art_designed_by", ModifierType.String) },
                 { "credit_album_art_designed_by",         new("credit_album_art_designed_by", ModifierType.String) },
                 { "credit_album_cover",                   new("credit_album_art_designed_by", ModifierType.String) },

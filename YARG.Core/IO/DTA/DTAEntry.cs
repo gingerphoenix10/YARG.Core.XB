@@ -14,14 +14,16 @@ namespace YARG.Core.IO
 
         public TextSpan? Name;
         public TextSpan? Artist;
+        public TextSpan? CoveredBy;
         public TextSpan? Album;
         public string? Genre;
         public string? Subgenre;
         public TextSpan? Charter;
         public string? Source;
-        public string? Playlist;
+        public TextSpan? Playlist;
         public TextSpan? LoadingPhrase;
         public int? YearAsNumber;
+        public int? YearSecondaryAsNumber;
 
         public long? SongLength;
         public SongRating? SongRating;
@@ -74,6 +76,7 @@ namespace YARG.Core.IO
                 {
                     case "name": Name = YARGDTAReader.ExtractTextBytes(ref container); break;
                     case "artist": Artist = YARGDTAReader.ExtractTextBytes(ref container); break;
+                    case "covered_by": CoveredBy = YARGDTAReader.ExtractTextBytes(ref container); break;
                     case "master": IsMaster = YARGDTAReader.ExtractBoolean_FlippedDefault(ref container); break;
                     case "context":
                         unsafe
@@ -230,14 +233,14 @@ namespace YARG.Core.IO
                         break;
                     }
                     case "song_id": SongID = YARGDTAReader.ExtractText(ref container); break;
-                    case "rating": SongRating = (SongRating) YARGDTAReader.ExtractInteger<uint>(ref container); break;
+                    case "rating": SongRating = RatingHelper.ParseSongRating(YARGDTAReader.ExtractInteger<uint>(ref container)); break;
                     case "short_version": /*ShortVersion = YARGDTAReader.Extract<uint>(ref container);*/ break;
                     case "album_art": /*HasAlbumArt = YARGDTAReader.ExtractBoolean(ref container);*/ break;
-                    case "year_released":
-                    case "year_recorded": YearAsNumber = YARGDTAReader.ExtractInteger<int>(ref container); break;
+                    case "year_released": YearAsNumber = YARGDTAReader.ExtractInteger<int>(ref container); break;
+                    case "year_recorded": YearSecondaryAsNumber = YARGDTAReader.ExtractInteger<int>(ref container); break;
                     case "album_name": Album = YARGDTAReader.ExtractTextBytes(ref container); break;
                     case "album_track_number": AlbumTrack = YARGDTAReader.ExtractInteger<int>(ref container); break;
-                    case "pack_name": Playlist = YARGDTAReader.ExtractText(ref container); break;
+                    case "pack_name": Playlist = YARGDTAReader.ExtractTextBytes(ref container); break;
                     case "base_points": /*BasePoints = YARGDTAReader.Extract<uint>(ref container);*/ break;
                     case "band_fail_cue": /*BandFailCue = YARGDTAReader.ExtractText(ref container);*/ break;
                     case "drum_bank": DrumBank = YARGDTAReader.ExtractText(ref container); break;
@@ -335,5 +338,19 @@ namespace YARG.Core.IO
             entry.LoadData(nodename, container);
             return entry;
         }
+        //
+        // private static SongRating ParseSongRating(ref YARGTextContainer<byte> container)
+        // {
+        //     return YARGDTAReader.ExtractInteger<uint>(ref container) switch
+        //     {
+        //         0 => Song.SongRating.Unspecified,
+        //         1 => Song.SongRating.Family_Friendly,
+        //         2 => Song.SongRating.Supervision_Recommended,
+        //         3 => Song.SongRating.Mature,
+        //         4 => Song.SongRating.No_Rating,
+        //         5 => Song.SongRating.Sensitive_Content,
+        //         _ => Song.SongRating.Unspecified
+        //     };
+        // }
     }
 }
